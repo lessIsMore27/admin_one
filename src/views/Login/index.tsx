@@ -14,13 +14,13 @@ export default class Login extends React.Component {
           <Form className={ss.formWrap}>
             <Form.Item
               name="username"
-              rules={[{ required: true, message: 'Please input your Username!' }]}
+              rules={[{ required: true, message: '用户名不能为空!' }]}
             >
               <Input prefix={<UserOutlined />} placeholder="请输入账户" />
             </Form.Item>
             <Form.Item
               name="password"
-              rules={[{ required: true, message: 'Please input your Password!' }]}
+              rules={[{ required: true, message: '密码不能为空!' }]}
             >
               <Input
                 prefix={<LockOutlined />}
@@ -32,7 +32,7 @@ export default class Login extends React.Component {
               <Col span={12}>
                 <Form.Item
                   name="verificationCode"
-                  rules={[{ required: true, message: 'Please input your verificationCode!' }]}
+                  rules={[{ required: true, message: '验证码不能为空!' }]}
                 >
                   <Input
                     prefix={<SafetyCertificateOutlined />}
