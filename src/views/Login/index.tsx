@@ -5,13 +5,18 @@ import { UserOutlined, LockOutlined, SafetyCertificateOutlined } from "@ant-desi
 import ss from "./index.scss";
 
 export default class Login extends React.Component {
+
+
+  onFinish = (values: any) => {
+    console.log('Success', values)
+  }
   
   render () {
     return (
       <div className={ss.loginWrap}>
         <div className={ss.box}>
           <h3 className={ss.title}>用户登录</h3>
-          <Form className={ss.formWrap}>
+          <Form className={ss.formWrap} onFinish={this.onFinish}>
             <Form.Item
               name="username"
               rules={[{ required: true, message: '用户名不能为空!' }]}
