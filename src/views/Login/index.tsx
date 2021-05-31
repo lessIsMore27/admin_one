@@ -1,20 +1,52 @@
 import React from "react";
-import { Form, Input, Button, Row, Col } from "antd";
+import { Form, Input, Button, Row, Col, notification, message as antdMessage } from "antd";
 import { FormInstance } from 'antd/lib/form';
 import { UserOutlined, LockOutlined, SafetyCertificateOutlined } from "@ant-design/icons";
 
-import { webapi } from "webapi/index";
-
+import { webapi, RegularConfig } from "webapi/index";
+import { getRule } from "webapi/tool";
+import { lsSetItem } from "utils/webStore";
 
 import ss from "./index.scss";
 
-export default class Login extends React.Component {
+interface LoginState {
+  regularConfig: RegularConfig
+}
+
+export default class Login extends React.Component<{}, LoginState> {
   formRef =  React.createRef<FormInstance>();
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      regularConfig: {}
+    };
+  }
+
+  componentDidMount() {
+    webapi("GET", "/users/login", {}).then(({ status, result }) => {
+      if (status === 200) {
+        this.setState({
+          regularConfig: result.regularConfig
+        });
+      } else {
+        notification.open({
+          message: "",
+          description: "请求出错啦，请稍后刷新页面重试",
+          duration: 3
+        });
+      }
+    });
+  }
 
   onFinish = (val: any) => {
-    console.log("onfinish", val);
-    webapi("POST", "/users/login",{}).then(res => {
-      console.log(res);
+    webapi("POST", "/users/login",{...val}).then(({ status, result: { token, menu_tree }, message = "请求失败" }) => {
+      if (status === 200) {
+        lsSetItem("token", token);
+        lsSetItem("menuTree", JSON.stringify(menu_tree));
+
+      } else {
+        antdMessage.error(message);
+      }
     })
   };
 
@@ -27,6 +59,7 @@ export default class Login extends React.Component {
   };
   
   render () {
+    const { regularConfig } = this.state;
     return (
       <div className={ss.loginWrap}>
         <div className={ss.box}>
@@ -40,13 +73,13 @@ export default class Login extends React.Component {
           >
             <Form.Item
               name="username"
-              rules={[{ required: true, message: '用户名不能为空!' }]}
+              rules={getRule(regularConfig?.username)}
             >
               <Input prefix={<UserOutlined />} placeholder="请输入账户" />
             </Form.Item>
             <Form.Item
               name="password"
-              rules={[{ required: true, message: '密码不能为空!' }]}
+              rules={getRule(regularConfig?.password)}
             >
               <Input
                 prefix={<LockOutlined />}
@@ -58,7 +91,6 @@ export default class Login extends React.Component {
               <Col span={12}>
                 <Form.Item
                   name="verificationCode"
-                  rules={[{ required: true, message: '验证码不能为空!' }]}
                 >
                   <Input
                     prefix={<SafetyCertificateOutlined />}
